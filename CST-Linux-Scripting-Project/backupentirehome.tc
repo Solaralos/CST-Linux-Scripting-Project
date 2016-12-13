@@ -1,0 +1,32 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Backup entire home directory' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will backup the entire /home directory."
+INVALID="YES"
+while [ $INVALID="YES" ]
+do
+echo
+echo "Please enter the directory that you would like to backup the entire home directory to. (or press x to exit this script)"
+read BACKUP
+if [ $BACKUP = "x" ]
+then
+echo "$USERNAME exited the 'backup entire home directory' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+ls $BACKUP >> /dev/null
+fi
+if [ $? -eq 0 ]
+then
+cp -avr /home/* $BACKUP
+echo
+echo "The entire home directory has been backed up to $BACKUP."
+echo "$USERNAME backed up the entire home directory to $BACKUP at $TID." >> /root/logs/log.$DATO
+INVALID="NO"
+exit
+else
+echo
+echo "$USERNAME attempted to backup the entire home directory at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Could not find the directory '$BACKUP'. Please try again."
+fi
+done

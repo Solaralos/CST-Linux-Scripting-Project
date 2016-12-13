@@ -1,0 +1,62 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Create multiple users from a file' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will create multiple users by using a file."
+INVALIDFILE="YES"
+while [ $INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name (including path) of the file that contains the users you want to create. Or you can press x to exit this script."
+read FILE
+if [ $FILE = "x" ]
+then
+echo "$USERNAME exited the 'create users from file' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+ls $FILE >> /dev/null
+fi
+if [ $? -eq 0 ]
+then
+echo
+echo "Would you like to create home directories for the users in $FILE? (y/n)"
+read ANSWER
+if [ $ANSWER="y" ]
+then
+INVALIDFILE=NO
+IFS=$'\n'
+lst1=$(cat $FILE)
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+useradd -m $a1
+a2=$(echo $i | awk '{print $2}')
+echo -e "$a2\n$a2" | passwd $a1
+done
+echo
+echo "All of the users from the file $FILE now have a home directory."
+echo "$USERNAME created multiple users using the file $FILE and give them all home directories at $TID." >> /root/bin/logs/log.$DATO
+exit
+elif [ $ANSWER="n" ]
+then
+INVALIDFILE=NO
+IFS=$'\n'
+lst1=$(cat $FILE)
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+useradd $a1
+a2=$(echo $i | awk '{print $2}')
+echo -e "$a2\n$a2" | passwd $a1
+done
+echo 
+echo "All of the users from the file $FILE have been created without home directories."
+echo "$USERNAME created multiple users without home directories using the file $FILE at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+else
+echo
+echo "$USERNAME attempted to add users using the '$FILE' file at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to create users using the '$FILE' file. Please try again."
+fi
+done

@@ -1,0 +1,31 @@
+#!/bin/bash
+###############################################################################
+# name: renamefile.tc                                                         #
+# author: Thomas Robert Michael Curtis                                        #
+# date: Monday, April 25, 2016                                                #
+# purpose: to rename a file                                                   #
+# variables used:CURRENTDIRECTORY, FILENAME, NEWNAME                          #
+###############################################################################
+echo
+echo "This script will rename a file."
+echo
+echo "Please enter the current directory of the file that you would like to rename."
+echo
+read CURRENTDIRECTORY
+cd $CURRENTDIRECTORY
+echo
+echo "Here is a list of files in $CURRENTDIRECTORY"
+echo
+ls $CURRENTDIRECTORY
+echo
+echo "Please enter the name of the file in $CURRENTDIRECTORY that you would like to rename."
+echo 
+read FILENAME
+echo
+echo "Now enter the new name that you would like $FILENAME to be called."
+echo
+read NEWNAME
+echo
+mv $FILENAME $NEWNAME
+echo "$FILENAME has been renamed from $FILENAME to $NEWNAME."
+echo

@@ -1,0 +1,59 @@
+#!/bin/bash
+#exec 2> /dev/null
+echo
+echo "'Delete multiple users from a file' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will delete multiple users by using a file."
+INVALIDFILE="YES"
+while [ $INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name of the file, including the full path to it, that contains the users you want to delete. Or press x to exit this script."
+read FILE
+if [ $FILE = "x" ]
+then
+echo "$USERNAME exited the 'delete multiple users from a file' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+ls $FILE /dev/null
+if [ $? -eq 0 ]
+then
+echo
+echo "Would you also like to delete the home directories of the users in $FILE? (y/n)"
+read ANSWER
+if [ $ANSWER = "y" ]
+then
+INVALIDFILE=NO
+IFS=$'\n'
+lst1=$(cat $FILE)
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+userdel -r $a1
+done
+echo
+echo "All of the users and their homes from the file $FILE have been deleted."
+echo "$USERNAME deleted multiple users and their homes using the file $FILE at $TID." >> /root/bin/logs/log.$DATO
+exit
+elif [ $ANSWER = "n" ]
+then
+INVALIDFILE=NO
+IFS=$'\n'
+lst1=$(cat $FILE)
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+userdel $a1
+done
+echo
+echo "All of the users from the file $FILE have been deleted (but not their home directories, if they had one)."
+echo "$USERNAME deleted multiple (but not their home directories) using the file $FILE at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+else
+echo
+echo "$USERNAME attempted to delete users using the file '$FILE' at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to delete users using the '$FILE' file. Please try again."
+fi
+fi
+done

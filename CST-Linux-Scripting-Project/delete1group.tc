@@ -1,0 +1,44 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Delete a group' script started by $USERNAME at $TID." >> /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo
+echo "This script will delete 1 group."
+echo
+echo "1 = show a list of available groups (use up and down arrows to scroll and press q to exit)"
+echo "2 = delete an existing group"
+echo "x = exit this script"
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+cut -d: -f1 /etc/group | less
+elif [ $ANSWER = "2" ]
+then 
+INVALIDGROUP="YES"
+while INVALIDGROUP="YES"
+do
+echo
+echo "What group would you like to delete?"
+read GROUP
+groupdel $GROUP
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME deleted the group $GROUP at $TID." >> /root/bin/logs/log.$DATO
+echo "The group $GROUP has been deleted."
+INVALIDGROUP="NO"
+break
+else
+echo
+echo "$USERNAME attempted to delete the group $GROUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to delete that group. Please try again."
+fi
+done
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the 'Delete a group' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done

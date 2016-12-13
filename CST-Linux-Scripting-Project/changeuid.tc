@@ -1,0 +1,66 @@
+#!/bin/bash
+exec 2> /dev/null
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo "$USERNAME started the 'change a user's UID' script at $TID." >> /root/bin/logs/log.$DATO
+echo "This script will change a user's UID."
+echo
+echo "1 = show a list of available users (use up and down arrows to scroll and press q to exit)"
+echo "2 = change a user's UID"
+echo "x = exit this script"
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+cut -d: -f1 /etc/passwd | less
+elif [ $ANSWER = "2" ]
+then
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "Enter a username."
+read USER
+id $USER >> /dev/null
+if [ $? -ne 0 ]
+then
+echo
+echo "$USER is not a valid user, please try again."
+echo "$USERNAME attempted to change $USER's UID at $TID but failed." >> /root/bin/logs/log.$DATO
+else
+INVALIDUID="YES"
+INVALIDUSER="NO"
+while [ $INVALIDUID="YES" ]
+do
+echo
+echo "$USER's current UID is:"
+id -u $USER
+echo
+echo "Please enter a new UID for $USER."
+read UIDNUMBER
+usermod -u $UIDNUMBER $USER
+if [ $? -ne 0 ]
+then
+echo
+echo "Could not change $USER's UID to $UIDNUMBER. Please try again."
+echo "$USERNAME tried to change $USER's UID to $UIDNUMBER at $TID but failed." >> /root/bin/logs/log.$DATO
+else
+INVALIDUID="NO"
+echo
+echo "$USER's UID is now $UIDNUMBER."
+echo "$USERNAME changed $USER's UID to $UIDNUMBER at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done
+fi
+done
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the 'change a user's UID' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+echo
+echo "That is not a valid response, please try again."
+echo
+fi
+done

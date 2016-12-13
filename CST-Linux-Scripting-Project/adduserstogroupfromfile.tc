@@ -1,0 +1,39 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Add multiple users to a secondary group from a file' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will add several users to a secondary group by using a file."
+INVALIDFILE="YES"
+while [ $INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name (including path) of the file that contains the users and the groups you want to add them to. Or you can press x to exit this script."
+read FILE
+if [ $FILE = "x" ]
+then
+echo "$USERNAME exited the 'add users to group from file' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+ls $FILE >> /dev/null
+fi
+if [ $? -eq 0 ]
+then
+INVALIDFILE="NO"
+IFS=$'\n'
+lst1=$(cat $FILE)
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+a2=$(echo $i | awk '{print $2}')
+usermod -a -G $a2 $a1
+done
+echo
+echo "All of the users in $FILE have been succesfully added to the secondary groups listed in $FILE."
+echo "$USERNAME added several users to secondary groups using the file '$FILE' at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+echo
+echo "$USERNAME attempted to add users to secondary groups using the '$FILE' file at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to add users to groups using the '$FILE' file. Please try again."
+fi
+done

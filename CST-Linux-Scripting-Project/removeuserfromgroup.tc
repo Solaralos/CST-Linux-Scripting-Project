@@ -1,0 +1,43 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Remove a user from a secondary group' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will remove a user from a secondary group."
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "Enter the name of a user to see what groups they are in."
+echo
+read USER
+echo
+id $USER
+if [ $? -ne 0 ]
+then
+echo
+echo "$USER not found. Please try again."
+echo "$USERNAME tried to remove $USER from a secondary group at $TID but failed." >> /root/bin/logs/log.$DATO
+else
+INVALIDGROUP="YES"
+while [ INVALIDGROUP="YES" ]
+do
+echo
+echo "What secondary group would you like to remove $USER from?"
+echo
+read GROUP
+echo
+gpasswd -d $USER $GROUP
+if [ $? -ne 0 ]
+then
+echo "$GROUP not found. Please try again."
+echo "$USERNAME tried to remove $USER from $GROUP at $TID but failed." >> /root/bin/logs/log.$DATO
+else
+INVALIDGROUP="NO"
+echo
+echo "$USER has been removed from $GROUP."
+echo "$USERNAME removed $USER from $GROUP at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done
+fi
+done

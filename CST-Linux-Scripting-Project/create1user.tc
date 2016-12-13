@@ -1,0 +1,64 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Create a user' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo "This script will create one user account and set the password."
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "What would you like your username to be? (pressing x will exit this script)"
+read NEWUSER
+if [ $NEWUSER = "x" ]
+then
+echo "$USERNAME exited the 'create a user' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+useradd -m $NEWUSER
+if [ $? -eq 0 ]
+then
+INVALIDUSER="NO"
+break
+else
+echo "$USERNAME attempted to create the user $NEWUSER at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to create the user $NEWUSER. Please try again."
+fi
+fi
+done
+echo 
+echo "Do you want to create a home directory for $NEWUSER? (y/n)"
+read WANTHOME
+if [ $WANTHOME = "n" ]
+then
+rm -r /home/$NEWUSER
+fi
+echo
+echo "Would you like to set a specific UID for $NEWUSER? (y/n)"
+read WANTUID
+if [ $WANTUID = "y" ]
+then
+INVALIDUID="YES"
+while [ $INVALIDUID="YES" ]
+do
+echo
+echo "What would you like $NEWUSER's UID to be?"
+read NEWUSERID
+usermod -u $NEWUSERID $NEWUSER
+if [ $? -ne 0 ]
+then
+echo
+echo "Invalid UID. Please try again." 
+echo "$USERNAME attempted to change $NEWUSER's UID to $NEWUSERID at $TID but failed." >> /root/bin/logs/log.$DATO
+else
+INVALIDUID="NO"
+break
+fi
+done
+fi
+echo
+echo "Now please set a password for $NEWUSER."
+passwd $NEWUSER
+echo
+echo "$NEWUSER has been created."
+echo "$USERNAME created the user '$NEWUSER' with UID $NEWUSERID at $TID." >> /root/bin/logs/log.$DATO
+WORKTODO="no"
+exit

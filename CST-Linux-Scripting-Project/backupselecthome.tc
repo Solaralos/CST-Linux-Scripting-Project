@@ -1,0 +1,48 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Backup a selected user's home directory' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will backup a single user's /home directory."
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "Please enter the home directory of the user that you would like to back up. (or press x to exit this script)"
+read USER
+if [ $USER = "x" ]
+then
+echo "$USERNAME exited the 'backup specific home directory' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+ls /home/$USER >> /dev/null
+fi
+if [ $? -ne 0 ]
+then
+echo
+echo "$USERNAME attempted to backup $USER's home directory at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Could not find a home directory for '$USER'. Please try again."
+else
+INVALIDUSER="NO"
+INVALIDBACKUP="YES"
+while [ $INVALIDBACKUP="YES" ]
+do
+echo
+echo "Please enter the directory that you would like to backup $USER's home to."
+read BACKUP
+ls $BACKUP >> /dev/null
+if [ $? -eq 0 ]
+then
+cp -avr /home/$USER $BACKUP
+echo
+echo "$USER's home has been backed up to $BACKUP."
+echo "$USERNAME backed up up $USER's home directory to $BACKUP at $TID." >> /root/bin/logs/log.$DATO
+INVALIDBACKUP="NO"
+exit
+else
+echo
+echo "$USERNAME attempted to backup $USER's home directory to $BACKUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Could not find $BACKUP. Please try again."
+fi
+done
+fi
+done

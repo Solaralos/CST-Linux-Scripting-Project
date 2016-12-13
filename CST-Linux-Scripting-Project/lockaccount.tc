@@ -1,0 +1,66 @@
+exec 2> /dev/null
+echo "'Lock Account' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo "This script will lock or unlock a single account."
+echo
+echo "1 = show a list of available users (use up and down arrows to scroll and press q to exit)"
+echo "2 = lock an existing user"
+echo "3 = unlock an existing user"
+echo "x = exit this script"
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+cut -d: -f1 /etc/passwd | less
+elif [ $ANSWER = "2" ]
+then
+INVALIDUSERTOLOCK="YES"
+while [ $INVALIDUSERTOLOCK="YES" ]
+do
+echo
+echo "What user would you like to lock?"
+read USER
+usermod -s /sbin/nologin $USER
+if [ $? -eq 0 ]
+then
+INVALIDUSERTOLOCK="NO"
+break
+else
+echo "$USERNAME attempted to lock the user '$USER' at $TID but failed." >> /root/bin/logs/log.$DATO
+echo
+echo "Could not lock the user '$USER'. Please try again."
+fi
+done
+echo
+echo "$USERNAME locked the user '$USER' at $TID." >> /root/bin/logs/log.$DATO
+echo "$USER's account has been locked."
+elif [ $ANSWER = "3" ]
+then
+INVALIDUSERTOUNLOCK="YES"
+while [ $INVALIDUSERTOUNLOCK="YES" ]
+do
+echo
+echo "What user would you like to unlock?"
+read USER
+usermod -s /bin/bash $USER
+if [ $? -eq 0 ]
+then
+INVALIDUSERTOUNLOCK="NO"
+break
+else
+echo "$USERNAME attempted to unlock the user '$USER' at $TID but failed." >> /root/bin/logs/log.$DATO
+echo
+echo "Could not unlock the user '$USER'. Please try again."
+fi
+done
+echo
+echo "$USERNAME unlocked the user '$USER' at $TID." >> /root/bin/logs/log.$DATO
+echo "$USER's account has been unlocked."
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the 'Lock Account' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done

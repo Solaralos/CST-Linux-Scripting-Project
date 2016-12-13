@@ -1,0 +1,68 @@
+exec 2> /dev/null
+echo "'Create a group' script started at $TID by $USERNAME" >> /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ WORKTODO="YES" ]
+do
+echo
+echo "1 = Create a new group."
+echo "x = exit this script"
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+INVALIDGROUP="YES"
+while [ $INVALIDGROUP="YES" ]
+do
+echo
+echo "What would you like your group to be called?"
+read GROUP
+groupadd $GROUP
+if [ $? -eq 0 ]
+then
+groupdel $GROUP
+INVALIDGROUP=NO
+break
+else
+echo
+echo "$USERNAME attempted to create the group $GROUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to create the $GROUP group. Please try again."
+fi
+done
+echo
+echo "Do you want to set a specific GID for the $GROUP group? (y/n)"
+read WANTGID
+if [ $WANTGID = "n" ]
+then
+groupadd $GROUP
+echo
+echo "$USERNAME created the group '$GROUP' at $TID." >> /root/bin/logs/log.$DATO
+echo "The group $GROUP has been created."
+fi
+if [ $WANTGID = "y" ]
+then
+INVALIDGID="YES"
+while [ $INVALIDGID="YES" ]
+do
+echo
+echo "What what you like $GROUP's GID to be?"
+read SPECIFICGID
+groupadd -g $SPECIFICGID $GROUP
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME created the group '$GROUP' with GID $SPECIFICGID at $TID." >> /root/bin/logs/log.$DATO
+echo "The group $GROUP has been created with the GID $SPECIFICGID."
+INVALIDGID="NO"
+break
+else
+echo
+echo "$USERNAME attempted to create the group '$GROUP' with GID $SPECIFICGID at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Invalid GID, please try again."
+fi
+done
+fi
+elif [ $ANSWER = "x" ]
+then
+echo "'Create a group' script exited at $TID by $USERNAME" >> /root/bin/logs/log.$DATO
+exit
+fi
+done

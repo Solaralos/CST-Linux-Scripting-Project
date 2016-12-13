@@ -1,0 +1,6 @@
+#!/bin/bash
+for EACHUSER in $(cat /root/Desktop/accounts.txt)
+do
+USER=$(echo $EACHUSER | cut -f1 -d :)
+echo $USER
+done

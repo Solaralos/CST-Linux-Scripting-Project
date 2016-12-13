@@ -1,0 +1,167 @@
+#!/bin/bash
+exec 2> /dev/null
+DATO=$(date +"%F")
+touch /root/bin/logs/log.$DATO
+TID=$(date +"%H:%M")
+export DATO TID
+echo "Log file for $DATO.
+Menu script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+cat -n /root/bin/logs/log.$DATO | sort --key=2.1 -b -u |sort -n | cut -c8- > /root/bin/logs/temp.$DATO && mv /root/bin/logs/temp.$DATO /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo
+echo "From this menu you can manage users, groups, or files/directories. Which would you like to do?"
+echo
+echo "0 = Exit this menu."
+echo "1 = User Management"
+echo "2 = Group Management"
+echo "3 = File/Directory Management"
+echo
+read INPUT
+if [ $INPUT = "1" ]
+then
+USERMANAGEMENT="YES"
+while [ USERMANAGEMENT="YES" ]
+do
+echo
+echo "Welcome to User Management. What would you like to do?"
+echo
+echo "0 = Go back to the first menu."
+echo "1 = Create a new user and (optionally) a home directory and (optionally) a specific user ID."
+echo "2 = Delete an existing user and/or their home."
+echo "3 = Create multiple users and/or their home from a file."
+echo "4 = Delete multiple users and/or their home from a file."
+echo "5 = Change a user's password."
+echo "6 = Lock/unlock a user account"
+echo "7 = Change a user's UID"
+echo "8 = Change a user's home directory"
+echo
+read ANSWER
+if [ $ANSWER = "0" ]
+then
+/bin/menu.tc
+elif [ $ANSWER = "1" ]
+then
+/bin/create1user.tc
+elif [ $ANSWER = "2" ]
+then
+/bin/delete1user.tc
+elif [ $ANSWER = "3" ]
+then
+/bin/usersfromfile.tc
+elif [ $ANSWER = "4" ]
+then
+/bin/deleteusersfromfile.tc
+elif [ $ANSWER = "5" ]
+then
+/bin/changeuserpassword.tc
+elif [ $ANSWER = "6" ]
+then
+/bin/lockaccount.tc
+elif [ $ANSWER = "7" ]
+then
+/bin/changeuid.tc
+elif [ $ANSWER = "8" ]
+then
+/bin/changehome.tc
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done
+elif [ $INPUT = "2" ]
+then
+GROUPMANAGEMENT="YES"
+while [ GROUPMANAGEMENT="YES" ]
+do
+echo
+echo "Welcome to Group Management. What would you like to do?"
+echo
+echo "0 = Go back to the first menu."
+echo "1 = Create a group."
+echo "2 = Delete a group."
+echo "3 = Add a user to a secondary group, or change their primary group."
+echo "4 = Add severals users to a secondary group using a file."
+echo "5 = Remove a user from a secondary group."
+echo
+read ANSWER2
+if [ $ANSWER2 = "1" ]
+then
+/bin/create1group.tc
+elif [ $ANSWER2 = "2" ]
+then
+/bin/delete1group.tc
+elif [ $ANSWER2 = "3" ]
+then
+/bin/addusertogroup.tc
+elif [ $ANSWER2 = "4" ]
+then
+/bin/adduserstogroupfromfile.tc
+elif [ $ANSWER2 = "5" ]
+then
+/bin/removeuserfromgroup.tc
+elif [ $ANSWER2 = "0" ]
+then
+/bin/menu.tc
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done
+elif [ $INPUT = "3" ]
+then
+FILEMANAGEMENT="YES"
+while [ $FILEMANAGEMENT="YES" ]
+do
+echo
+echo "Welcome to File/Directory Management. What would you like to do?"
+echo
+echo "0 = Go back to the first menu."
+echo "1 = Change the owner/group of a file/directory"
+echo "2 = Backup the entire home directory."
+echo "3 = Backup a selected user's home directory."
+echo "4 = Restore the entire home directory."
+echo "5 = Restore a selected user's home directory."
+echo "6 = Make a file executable."
+echo
+read ANSWER3
+if [ $ANSWER3 = "0" ]
+then
+/bin/menu.tc
+elif [ $ANSWER3 = "1" ]
+then
+/bin/chown.tc
+elif [ $ANSWER3 = "2" ]
+then
+backupentirehome.tc
+elif [ $ANSWER3 = "3" ]
+then
+backupselecthome.tc
+elif [ $ANSWER3 = "4" ]
+then
+restoreentirehome.tc
+elif [ $ANSWER3 = "5" ]
+then
+restoreselecthome.tc
+elif [ $ANSWER3 = "6" ]
+then
+/bin/makefileexecutable.tc
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done
+elif [ $INPUT="0" ]
+then
+echo "$USERNAME exited the menu script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done

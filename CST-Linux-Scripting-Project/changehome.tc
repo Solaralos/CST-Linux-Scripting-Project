@@ -1,0 +1,52 @@
+#!/bin/bash
+#exec 2> /dev/null
+echo "$USERNAME started the changehome script at $TID." >> /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo "This script will change a user's home directory."
+echo
+echo "1 = show a list of available users (use up and down arrows to scroll and press q to exit)"
+echo "2 = change a user's home directory."
+echo "x = exit this script"
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+cut -d: -f1 /etc/passwd | less
+elif [ $ANSWER = "2" ]
+then
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "Enter a username."
+read USER
+id $USER
+if [ $? -ne 0 ]
+then
+echo
+echo "$USER not found. Please try again."
+echo "$USERNAME tried to change $USER's password at $TID but they did not exist." >> /root/bin/logs/log.$DATO
+else
+INVALIDUSER="NO"
+awk -F: -v v="$USER" '{if ($1==v) print $6}' /etc/passwd > /temp
+OLDHOME=$(cat "/temp")
+echo "$USER's current home directory is /home/$OLDHOME."
+echo
+echo "What would you like $USER's new home directory to be called?"
+read HOME
+mkdir /home/$HOME
+mv /home/$OLDHOME/* /home/$HOME
+usermod -m -d /$HOME $USER
+echo
+echo "$USER's home is now /home/$HOME."
+echo "$USERNAME changed $USER's home to $HOME at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the changehome script at $TID." >> /root/bin/logs/log.$DATO
+exit
+fi
+done

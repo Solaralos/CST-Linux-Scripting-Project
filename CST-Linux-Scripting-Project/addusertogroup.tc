@@ -1,0 +1,80 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Add user to group' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo
+echo "1 = show a list of available groups (use up and down arrows to scroll and press q to exit)"
+echo "2 = show a list of available users (use up and down arrows to scroll and press q to exit)"
+echo "3 = add a user to a secondary group"
+echo "4 = change a user's primary group"
+echo "x = exit this script"
+echo
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+cut -d: -f1 /etc/group | less
+elif [ $ANSWER = "2" ]
+then 
+cut -d: -f1 /etc/passwd | less
+elif [ $ANSWER = "3" ]
+then
+INVALIDGROUPORUSER="YES"
+while [ INVALIDGROUPORUSER="YES" ]
+do
+echo
+echo "What user would you like to add to a secondary group?"
+echo
+read USER
+echo
+echo "What secondary group would you like to add $USER to?"
+echo
+read GROUP
+usermod -a -G $GROUP $USER
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME added the user $USER to the secondary group $GROUP at $TID." >> /root/bin/logs/log.$DATO
+echo "$USER has been added to the secondary group $GROUP"
+INVALIDGROUPORUSER="NO"
+break
+else
+echo 
+echo "$USERNAME attempted to add the user $USER to the secondary group $GROUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to add the user $USER to the secondary group $GROUP. Please try again."
+fi
+done
+elif [ $ANSWER = "4" ]
+then
+INVALIDGROUPORUSER="YES"
+while [ INVALIDGROUPORUSER="YES" ]
+do
+echo
+echo "For what user would you like to change the primary group?"
+echo
+read USER
+echo
+echo "What would you like $USER's new primary group to be?"
+echo
+read GROUP
+usermod -g $GROUP $USER
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME changed $USER's primary group to $GROUP at $TID." >> /root/bin/logs/log.$DATO
+echo "$USER's primary group has been changed to $GROUP"
+INVALIDGROUPORUSER="NO"
+break
+else
+echo 
+echo "$USERNAME attempted change $USER's primary group to $GROUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to change $USER's primary group to $GROUP. Please try again."
+fi
+done
+elif [ $ANSWER = "x" ]
+then
+echo "Addusertogroup script exited at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+exit
+fi
+done

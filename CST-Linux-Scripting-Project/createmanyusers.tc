@@ -1,0 +1,30 @@
+#!/bin/bash
+echo "'Create multiple users from a file' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will create multiple users by using a file."
+INVALIDFILE="YES"
+while [ $INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name (including path) of the file that contains the users you want to create."
+read FILE
+IFS=$'\n'
+lst1=$(cat $FILE)
+ls $FILE >
+if [ $? -eq 0 ]
+then
+INVALIDFILE="NO"
+for i in $lst1
+do
+a1=$(echo $i | awk '{print $1}')
+useradd $a1
+a2=$(echo $i | awk '{print $2}')
+echo -e "$a2\n$a2" | passwd $a1
+break
+done
+else
+echo
+echo "$USERNAME attempted to add users using the '$FILE' file at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to create users using the '$FILE' file. Please try again."
+fi
+done

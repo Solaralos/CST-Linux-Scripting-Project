@@ -1,0 +1,36 @@
+echo "$USERNAME started the 'Make file executable' script at $TID." >> /root/bin/logs/log.$DATO
+exec 2> /dev/null
+WORKTODO="YES"
+while [ WORKTODO="YES" ]
+do
+echo
+echo "This script will make a file executable."
+echo "To make a file executable, press 1, to exit this script, press 0."
+read INPUT
+if [ $INPUT = "1" ]
+then
+INVALIDFILE="YES"
+while [ INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name of the file in /bin that you would like to make executable."
+echo
+read FILENAME
+chmod 777 /bin/$FILENAME
+if [ $? -eq 0 ]
+then
+INVALIDFILE="NO"
+break
+else
+echo "$USERNAME attempted to make the file $FILENAME executable at $TID but failed." >>/root/bin/logs/log.$DATO
+echo "That file does not exist. Please try again."
+fi
+done
+echo
+echo "$USERNAME made the file $FILENAME executable at $TID." >>/root/bin/logs/log.$DATO
+echo "$FILENAME is now executable."
+else 
+echo "The 'Make file executable' script was exited at $TID by $USERNAME." >>/root/bin/logs/log.$DATO
+exit
+fi
+done

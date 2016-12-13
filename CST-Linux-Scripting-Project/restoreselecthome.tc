@@ -1,0 +1,48 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Restore a selected user's home directory' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+echo
+echo "This script will restore a single user's /home directory."
+INVALIDUSER="YES"
+while [ $INVALIDUSER="YES" ]
+do
+echo
+echo "Please enter the user whose home you would like to restore. (or press x to exit this script)"
+read USER
+if [ $USER = "x" ]
+then
+echo "$USERNAME exited the 'restore a specific home directory' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+id $USER >> /dev/null
+fi
+if [ $? -ne 0 ]
+then
+echo
+echo "$USERNAME attempted to restore $USER's home directory at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "The user '$USER' does not exist. Pleasy try again."
+else
+INVALIDUSER="NO"
+INVALIDBACKUP="YES"
+while [ $INVALIDBACKUP="YES" ]
+do
+echo
+echo "Please enter the directory where the backup of $USER's home is located."
+read BACKUP
+ls $BACKUP >> /dev/null
+if [ $? -eq 0 ]
+then
+rsync -r $BACKUP/$USER /home
+echo
+echo "$USER's home has been restored from $BACKUP."
+echo "$USERNAME restored $USER's home directory from $BACKUP at $TID." >> /root/bin/logs/log.$DATO
+INVALIDBACKUP="NO"
+exit
+else
+echo
+echo "$USERNAME attempted to restore $USER's home directory from $BACKUP at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Could not find $BACKUP. Please try again."
+fi
+done
+fi
+done

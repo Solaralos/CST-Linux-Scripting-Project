@@ -1,0 +1,31 @@
+#!/bin/bash
+###############################################################################
+# name: movefile.tc                                                           #
+# author: Thomas Robert Michael Curtis                                        #
+# date: Monday, April 25, 2016                                                #
+# purpose: to move a file from one directory to another                       #
+# variables used:CURRENTDIRECTORY, FILENAME, NEWDIRECTORY                     #
+###############################################################################
+echo
+echo "This script will move a file from one directory to another directory."
+echo
+echo "Please enter the current directory of the file that you would like to move."
+echo
+read CURRENTDIRECTORY
+cd $CURRENTDIRECTORY
+echo
+echo "Here is a list of files in $CURRENTDIRECTORY"
+echo
+ls $CURRENTDIRECTORY
+echo
+echo "Please enter the name of the file in $CURRENTDIRECTORY that you would like to move."
+echo 
+read FILENAME
+echo
+echo "Now enter the directory that you would like to move $FILENAME to."
+echo
+read NEWDIRECTORY
+echo
+mv $FILENAME $NEWDIRECTORY
+echo "$FILENAME has been moved from $CURRENTDIRECTORY to $NEWDIRECTORY."
+echo

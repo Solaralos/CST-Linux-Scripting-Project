@@ -1,0 +1,59 @@
+#!/bin/bash
+exec 2> /dev/null
+WORKTODO="YES"
+echo "'Change a file's owner/group' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+INVALIDFILE="YES"
+while [ $INVALIDFILE="YES" ]
+do
+echo
+echo "Please enter the name of the file that you wish to change ownership of." 
+echo "(if not in the pwd then enter full path too)."
+echo "After you enter the name you will see the current owner (on the left) and the current group (on the right)."
+echo
+read FILE
+stat -c "%U %G" $FILE
+if [ $? -ne 0 ]
+then
+echo "$FILE not found, please try again."
+echo "$USERNAME tried to change the owner of $FILE at $TID but $FILE did not exist." >> /root/bin/logs/log.$DATO
+else
+INVALIDFILE="NO"
+while WORKTODO="YES"
+do
+echo
+echo "u = Change the owner of $FILE"
+echo "g = Change what group $FILE belongs to."
+echo "x = Exit this script."
+read ANSWER
+if [ $ANSWER = "u" ]
+then
+echo
+echo "What user would you like to become the owner of $FILE?"
+echo
+read USER
+chown $USER $FILE
+echo
+echo "$USER is now the owner of $FILE."
+echo "$USERNAME changed the owner of $FILE to $USER at $TID." >> /root/bin/logs/log.$DATO
+elif [ $ANSWER = "g" ]
+then
+echo
+echo "What group would you like $FILE to belong to?"
+echo
+read GROUP
+chgrp $GROUP $FILE
+echo 
+echo "$FILE now belongs to the $GROUP group."
+echo "$USERNAME changed $FILE's group to $GROUP at $TID." >> /root/bin/logs/log.$DATO
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the 'change a file's owner/group' script at $TID." >> /root/bin/logs/log.$DATO
+exit
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done
+fi
+done

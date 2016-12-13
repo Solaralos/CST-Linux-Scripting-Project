@@ -1,0 +1,90 @@
+#!/bin/bash
+exec 2> /dev/null
+echo "'Delete a user' script started at $TID by $USERNAME." >> /root/bin/logs/log.$DATO
+WORKTODO="YES"
+while [ $WORKTODO="YES" ]
+do
+echo
+echo "This script will delete a single user and/or their home."
+echo
+echo "1 = Show a list of all existing users. (use up and down arrows to scroll and press q to quit)"
+echo "2 = Delete a user and their home"
+echo "3 = Delete a user without deleting their home"
+echo "4 = Delete a user's home without deleting the user"
+echo "x = Exit this script."
+read ANSWER
+if [ $ANSWER = "1" ]
+then
+awk -F':' '{ print $1}' /etc/passwd | less
+elif [ $ANSWER = "2" ]
+then
+INVALIDUSERANDHOME="YES"
+while [ $INVALIDUSERANDHOME="YES" ]
+do
+echo
+echo "What user would you like to delete?"
+read USER
+userdel -r $USER
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME deleted the user $USER and their home at $TID." >> /root/bin/logs/log.$DATO
+echo "The user $USER and their home have been deleted."
+INVALIDUSERANDHOME="NO"
+break
+else
+echo
+echo "$USERNAME attempted to delete the user $USER and their home at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to delete that user. Please try again."
+fi
+done
+elif [ $ANSWER = "3" ]
+then 
+INVALIDUSERNAME="YES"
+while [ $INVALIDUSERNAME="YES" ]
+do
+echo
+echo "What user would you like to delete?"
+read USER
+userdel $USER
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME deleted the user $USER at $TID." >> /root/bin/logs/log.$DATO
+echo "The user $USER has been deleted"
+INVALIDUSERNAME="NO"
+break
+else
+echo
+echo "$USERNAME attempted to delete the user $USER at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to delete that user. Please try again."
+fi
+done
+elif [ $ANSWER = "4" ]
+then
+echo
+echo "What user's home directory would you like to delete?"
+read USER
+rm -rf /home/$USER
+if [ $? -eq 0 ]
+then
+echo
+echo "$USERNAME deleted $USER's home directory at $TID." >> /root/bin/logs/log.$DATO
+echo "$USER's home directory has been deleted."
+INVALIDUSERNAME="NO"
+break
+else
+echo
+echo "$USERNAME attempted to delete $USER's home directory at $TID but failed." >> /root/bin/logs/log.$DATO
+echo "Unable to delete $USER's home directory. Please try again."
+fi
+elif [ $ANSWER = "x" ]
+then
+echo "$USERNAME exited the 'Delete a user' script at $TID" >> /root/bin/logs/log.$DATO
+exit
+else
+echo
+echo "That is not a valid response. Please try again."
+echo
+fi
+done
